@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <script src="js/jquery-1.6.4.min.js"></script>
+    <video id="myVideo" autoplay="autoplay"></video>
+    <br />
+    <input type="button" value="����" /><br />
+    ���սY��
+    <div id="result">
+    </div>
+    <script type="text/javascript">
+ 
+        $(document).ready(init);
+ 
+        function init() {
+ 
+            //Google ChromeҪ��webkitGetUserMedia��ʽ
+            navigator.webkitGetUserMedia("video", success);  //�@ʾӰ��
+ 
+ 
+            //���xbutton�c�x��Ҫ��ʲ�N
+            $("input[type='button']").click(function () {
+                shoot(); //��������
+            });
+        }
+        function success(stream) {
+ 
+            $("#myVideo").attr("src", window.webkitURL.createObjectURL(stream));
+        }
+        //��������
+        function shoot() {
+ 
+            var video = $("#myVideo")[0];
+            var canvas = capture(video);
+ 
+ 
+            $("#result").empty();
+            $("#result").append(canvas); //�ʬF�D��(���սY��)
+            var imgData = canvas.toDataURL("image/jpg");
+            var base64String = imgData.substr(22); //ȡ��base64�ִ�
+ 
+            //�ς�������DƬ
+            $.ajax({
+                url: "Handler.ashx",
+                type: "post",
+                data: { data: base64String },
+                async: true,
+                success: function (htmlVal) {
+                    alert("���DƬ�ɹ���");
+                }, error: function (e) {
+                    alert(e.responseText); //alert�e�`ӍϢ
+                }
+ 
+            });
+        }
+ 
+        //��videoԪ��ץȡ�D��canvas
+        function capture(video) {
+ 
+            var canvas = document.createElement('canvas'); //����canvas js DOMԪ��
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            return canvas;
+        }
+    </script>
+</body>
+</html>
